@@ -1,0 +1,15 @@
+{
+  "name": "signalk-attitude-converter",
+  "version": "1.0.0",
+  "description": "Converts between navigation.attitude (object) and individual values (pitch/roll/yaw)",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin"
+  ],
+  "author": "Jean-Laurent Girod",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/macjl/signalk-attitude-converter.git"
+  }
+}
