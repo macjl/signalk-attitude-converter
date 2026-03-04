@@ -10,6 +10,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/macjl/signalk-attitude-converter.git"
+    "url": "git+https://github.com/macjl/signalk-attitude-converter.git"
   }
 }
