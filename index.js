@@ -24,8 +24,21 @@ module.exports = function(app) {
     }
   };
 
+  plugin.uiSchema = {};
+
   plugin.start = function(options) {
     app.debug(`Attitude Converter plugin started in mode: ${options.direction}`);
+
+    // Declare units for the individual paths
+    app.handleMessage(plugin.id, {
+      updates: [{
+        meta: [
+          { path: 'navigation.attitude.pitch', value: { units: 'rad', description: 'Pitch angle, +bow up' } },
+          { path: 'navigation.attitude.roll',  value: { units: 'rad', description: 'Roll angle, +starboard down' } },
+          { path: 'navigation.attitude.yaw',   value: { units: 'rad', description: 'Yaw angle' } }
+        ]
+      }]
+    });
 
     if (options.direction === 'object-to-values') {
       startObjectToValues();

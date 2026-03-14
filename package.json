@@ -1,6 +1,6 @@
 {
   "name": "signalk-attitude-converter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Converts between navigation.attitude (object) and individual values (pitch/roll/yaw)",
   "main": "index.js",
   "keywords": [
