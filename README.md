@@ -1,47 +1,50 @@
-# SignalK Attitude Converter
+# signalk-attitude-converter
 
-Converts between `navigation.attitude` (object) and individual values (`pitch`/`roll`/`yaw`).
+SignalK plugin that converts between `navigation.attitude` (object) and individual `pitch`, `roll`, and `yaw` values.
 
-## Installation
-```bash
-npm install --prefix ~/.signalk https://github.com/macjl/signalk-attitude-converter.git
-```
+## Conversion modes
 
-Or from the SignalK plugin installer (Appstore) if published to npm.
+**Object → Values** (`object-to-values`)
 
-Restart SignalK server.
+Subscribes to `navigation.attitude` (object) and republishes each component as individual paths:
+- `navigation.attitude.pitch`
+- `navigation.attitude.roll`
+- `navigation.attitude.yaw`
+
+**Values → Object** (`values-to-object`)
+
+Subscribes to the three individual paths and republishes them as a `navigation.attitude` object.
 
 ## Configuration
 
-Go to **Server → Plugin Config → Attitude Converter**.
+| Option | Description | Default |
+|--------|-------------|---------|
+| Conversion Direction | `object-to-values` or `values-to-object` | `object-to-values` |
+| Source filter | Only convert values from this source label. Leave empty to convert all sources. | *(all)* |
 
-Choose conversion direction:
-- **Object → Values**: Splits `navigation.attitude` into separate `pitch`, `roll`, and `yaw` paths
-- **Values → Object**: Combines individual `pitch`, `roll`, and `yaw` values into `navigation.attitude` object
+## Units
 
-The plugin preserves timestamps from the original data.
+All values are in **radians**, as per the SignalK specification. The plugin declares `units: rad` metadata for the three individual paths at startup.
 
-## Usage Examples
+## Installation
 
-### Mode: Object → Values
-Send this delta:
-```json
-{
-  "path": "navigation.attitude",
-  "value": {"pitch": 0.15, "roll": -0.08, "yaw": 1.57}
-}
+```sh
+npm install --prefix ~/.signalk signalk-attitude-converter
 ```
-Results in three separate paths: `navigation.attitude.pitch`, `navigation.attitude.roll`, `navigation.attitude.yaw`
 
-### Mode: Values → Object
-Send individual values:
-```json
-{"path": "navigation.attitude.pitch", "value": 0.15}
-{"path": "navigation.attitude.roll", "value": -0.08}
-{"path": "navigation.attitude.yaw", "value": 1.57}
-```
-Results in: `navigation.attitude` object containing all three values
+Restart SignalK after installation, then configure via **Server → Plugin Config → Attitude Converter**.
+
+## Changelog
+
+### 0.1.2
+- Added optional source filter to limit conversion to a specific source label
+
+### 0.1.1
+- Added unit metadata (`rad`) for `navigation.attitude.pitch`, `.roll` and `.yaw` paths
+
+### 0.1.0
+- Initial release
 
 ## License
 
-MIT
+MIT — Jean-Laurent Girod
