@@ -20,6 +20,12 @@ module.exports = function(app) {
           'Values → Object (pitch/roll/yaw → attitude)'
         ],
         default: 'object-to-values'
+      },
+      sourceFilter: {
+        type: 'string',
+        title: 'Source filter (optional)',
+        description: 'Only convert values from this source label. Leave empty to convert all sources.',
+        default: ''
       }
     }
   };
@@ -27,7 +33,8 @@ module.exports = function(app) {
   plugin.uiSchema = {};
 
   plugin.start = function(options) {
-    app.debug(`Attitude Converter plugin started in mode: ${options.direction}`);
+    const sourceFilter = options.sourceFilter ? options.sourceFilter.trim() : '';
+    app.debug(`Attitude Converter plugin started in mode: ${options.direction}, source=${sourceFilter || '(all)'}`);
 
     // Declare units for the individual paths
     app.handleMessage(plugin.id, {
@@ -41,14 +48,14 @@ module.exports = function(app) {
     });
 
     if (options.direction === 'object-to-values') {
-      startObjectToValues();
+      startObjectToValues(sourceFilter);
     } else {
-      startValuesToObject();
+      startValuesToObject(sourceFilter);
     }
   };
 
   // Mode: Object → Individual Values
-  function startObjectToValues() {
+  function startObjectToValues(sourceFilter) {
     let localSubscription = {
       context: 'vessels.self',
       subscribe: [{
@@ -65,6 +72,7 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(update => {
+          if (sourceFilter && update.source && update.source.label !== sourceFilter) return;
           update.values.forEach(value => {
             if (value.path === 'navigation.attitude' && value.value) {
               handleAttitudeObjectUpdate(value.value, update.timestamp);
@@ -121,7 +129,7 @@ module.exports = function(app) {
   }
 
   // Mode: Individual Values → Object
-  function startValuesToObject() {
+  function startValuesToObject(sourceFilter) {
     let localSubscription = {
       context: 'vessels.self',
       subscribe: [
@@ -146,6 +154,7 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(update => {
+          if (sourceFilter && update.source && update.source.label !== sourceFilter) return;
           update.values.forEach(value => {
             if (value.path === 'navigation.attitude.pitch') {
               attitudeCache.pitch = value.value;
