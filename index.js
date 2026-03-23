@@ -24,7 +24,7 @@ module.exports = function(app) {
       sourceFilter: {
         type: 'string',
         title: 'Source filter (optional)',
-        description: 'Only convert values from this source label. Leave empty to convert all sources.',
+        description: 'Only convert values from this source. Use the full source identifier as shown in the Data Browser (e.g. "signalk-attitude-calibrator.0"). Leave empty to convert all sources.',
         default: ''
       }
     }
@@ -72,7 +72,7 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(update => {
-          if (sourceFilter && update.source && update.source.label !== sourceFilter) return;
+          if (sourceFilter && update.$source !== sourceFilter) return;
           update.values.forEach(value => {
             if (value.path === 'navigation.attitude' && value.value) {
               handleAttitudeObjectUpdate(value.value, update.timestamp);
@@ -154,7 +154,7 @@ module.exports = function(app) {
       },
       delta => {
         delta.updates.forEach(update => {
-          if (sourceFilter && update.source && update.source.label !== sourceFilter) return;
+          if (sourceFilter && update.$source !== sourceFilter) return;
           update.values.forEach(value => {
             if (value.path === 'navigation.attitude.pitch') {
               attitudeCache.pitch = value.value;
