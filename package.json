@@ -8,6 +8,12 @@
   ],
   "author": "Jean-Laurent Girod",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node -e \"require('.')\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/macjl/signalk-attitude-converter.git"
