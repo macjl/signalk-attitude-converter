@@ -4,13 +4,16 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: true
 
       - uses: actions/setup-node@v4
@@ -25,14 +28,23 @@ jobs:
             npm version "$VERSION" --no-git-tag-version
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
-            git add package.json package-lock.json
+            git add package.json
+            if [ -f package-lock.json ]; then
+              git add package-lock.json
+            fi
             git commit -m "Sync package version with release tag $VERSION"
-            git push
+            git push origin HEAD:${{ github.event.repository.default_branch }}
           else
             echo "Version already at $VERSION, skipping sync"
           fi
 
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
   publish-npm:
     needs: build
@@ -40,12 +52,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.repository.default_branch }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
